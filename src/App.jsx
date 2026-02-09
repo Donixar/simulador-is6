@@ -104,8 +104,8 @@ function TabResumen({ vig }) {
       </div>
       <div style={{ flex: 1, minWidth: 260, background: "#fff", borderRadius: 10, padding: 18, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
         <h3 style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 600, color: "#205C40" }}>Genero</h3>
-        <ResponsiveContainer width="100%" height={200}>
-          <PieChart><Pie data={sD} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}><Cell fill="#205C40" /><Cell fill="#64A70B" /></Pie><Tooltip /></PieChart>
+        <ResponsiveContainer width="100%" height={260}>
+          <PieChart><Pie data={sD} cx="50%" cy="55%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value" label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}><Cell fill="#205C40" /><Cell fill="#64A70B" /></Pie><Tooltip /></PieChart>
         </ResponsiveContainer>
       </div>
     </div>
