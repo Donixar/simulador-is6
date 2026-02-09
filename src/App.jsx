@@ -248,6 +248,81 @@ function TabDetalle({ vig, sd, actData, totH }) {
   );
 }
 
+function TabCambios({ changes, upInfo }) {
+  if (!upInfo) return (
+    <div style={{ background: "#fff", borderRadius: 10, padding: 40, boxShadow: "0 1px 3px rgba(0,0,0,0.05)", textAlign: "center" }}>
+      <div style={{ fontSize: 36, marginBottom: 12 }}>&#128203;</div>
+      <div style={{ fontSize: 14, color: "#999", fontWeight: 500 }}>Sube un archivo de dotacion vigente para ver los cambios detectados</div>
+    </div>
+  );
+
+  const removed = upInfo.removed || [];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: 150, background: "#fff", borderRadius: 10, padding: "14px 18px", boxShadow: "0 1px 3px rgba(0,0,0,0.07)", border: "1px solid #eee" }}>
+          <div style={{ fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Con cambios</div>
+          <div style={{ fontSize: 28, fontWeight: 700, color: changes.length > 0 ? "#E87722" : "#64A70B", marginTop: 2 }}>{changes.length}</div>
+        </div>
+        <div style={{ flex: 1, minWidth: 150, background: "#fff", borderRadius: 10, padding: "14px 18px", boxShadow: "0 1px 3px rgba(0,0,0,0.07)", border: "1px solid #eee" }}>
+          <div style={{ fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Ya no vigentes</div>
+          <div style={{ fontSize: 28, fontWeight: 700, color: removed.length > 0 ? "#A6093D" : "#64A70B", marginTop: 2 }}>{removed.length}</div>
+        </div>
+        <div style={{ flex: 1, minWidth: 150, background: "#fff", borderRadius: 10, padding: "14px 18px", boxShadow: "0 1px 3px rgba(0,0,0,0.07)", border: "1px solid #eee" }}>
+          <div style={{ fontSize: 10, color: "#999", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>Sin cambios</div>
+          <div style={{ fontSize: 28, fontWeight: 700, color: "#64A70B", marginTop: 2 }}>{upInfo.mt - changes.length}</div>
+        </div>
+      </div>
+
+      {changes.length > 0 && (
+        <div style={{ background: "#fff", borderRadius: 10, padding: 18, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+          <h3 style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 600, color: "#E87722" }}>Cambios detectados ({changes.length})</h3>
+          <div style={{ overflowX: "auto", maxHeight: 400, overflowY: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead style={{ position: "sticky", top: 0, zIndex: 1 }}><tr style={{ background: "#E87722" }}>
+                {["Nombre", "RUT", "Campo", "Antes", "Despues"].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", fontSize: 9, color: "#fff", fontWeight: 600, textTransform: "uppercase" }}>{h}</th>)}
+              </tr></thead>
+              <tbody>{changes.flatMap((ch, ci) => ch.diffs.map((d, di) => (
+                <tr key={`${ci}-${di}`} style={{ background: di === 0 && ci % 2 === 0 ? "#fafafa" : "#fff", borderBottom: di === ch.diffs.length - 1 ? "2px solid #f0f0f0" : "1px solid #f7f7f7" }}>
+                  {di === 0 ? <td rowSpan={ch.diffs.length} style={{ padding: "6px 10px", fontSize: 11, fontWeight: 600, verticalAlign: "top", borderRight: "2px solid #f0f0f0" }}>{ch.nombre}</td> : null}
+                  {di === 0 ? <td rowSpan={ch.diffs.length} style={{ padding: "6px 10px", fontSize: 10.5, color: "#666", verticalAlign: "top", borderRight: "2px solid #f0f0f0" }}>{ch.rut}</td> : null}
+                  <td style={{ padding: "6px 10px" }}><span style={{ fontSize: 10, fontWeight: 600, background: d.campo === "UEN" ? "#007DBA" : d.campo === "Puesto" ? "#53267A" : "#205C40", color: "#fff", borderRadius: 4, padding: "2px 8px" }}>{d.campo}</span></td>
+                  <td style={{ padding: "6px 10px", fontSize: 11, color: "#A6093D", textDecoration: "line-through" }}>{d.antes}</td>
+                  <td style={{ padding: "6px 10px", fontSize: 11, color: "#64A70B", fontWeight: 600 }}>{d.despues}</td>
+                </tr>
+              )))}</tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {removed.length > 0 && (
+        <div style={{ background: "#fff", borderRadius: 10, padding: 18, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+          <h3 style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 600, color: "#A6093D" }}>Ya no aparecen en dotacion ({removed.length})</h3>
+          <p style={{ margin: "0 0 12px", fontSize: 10, color: "#aaa" }}>Estas personas estaban en la base IS6 pero no aparecen en el archivo cargado (posible desvinculacion, renuncia, etc.)</p>
+          <div style={{ overflowX: "auto", maxHeight: 300, overflowY: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead style={{ position: "sticky", top: 0, zIndex: 1 }}><tr style={{ background: "#A6093D" }}>
+                {["Nombre", "RUT", "UEN", "Puesto", "Empresa"].map(h => <th key={h} style={{ padding: "8px 10px", textAlign: "left", fontSize: 9, color: "#fff", fontWeight: 600, textTransform: "uppercase" }}>{h}</th>)}
+              </tr></thead>
+              <tbody>{removed.map((r, i) => (
+                <tr key={i} style={{ background: i % 2 === 0 ? "#fafafa" : "#fff", borderBottom: "1px solid #f3f3f3" }}>
+                  <td style={{ padding: "6px 10px", fontSize: 11, fontWeight: 500 }}>{r.nombre}</td>
+                  <td style={{ padding: "6px 10px", fontSize: 10.5, color: "#666" }}>{r.rut}</td>
+                  <td style={{ padding: "6px 10px", fontSize: 10.5, color: "#666" }}>{r.uen}</td>
+                  <td style={{ padding: "6px 10px", fontSize: 10.5, color: "#666" }}>{r.puesto}</td>
+                  <td style={{ padding: "6px 10px", fontSize: 10.5, color: "#666" }}>{r.empresa}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const HASH = "a3c2f8d1e9"; // hashed version of password
 function hashPw(pw) {
   let h = 0;
@@ -316,6 +391,8 @@ export default function App() {
   const mas = useMemo(() => vig.filter(v => v.sexo === "M").length, [vig]);
   const uenCount = useMemo(() => new Set(vig.map(v => v.uen)).size, [vig]);
 
+  const [changes, setChanges] = useState([]);
+
   const doUpload = async (e) => {
     const file = e.target.files[0]; if (!file) return;
     setLoading(true);
@@ -323,14 +400,24 @@ export default function App() {
       const vRec = await parseFile(file);
       if (!vRec) { alert("No se encontro columna 'Id Empleado'"); setLoading(false); return; }
       const upd = applyCSV(vRec);
-      let ch = 0; upd.forEach(u => { const o = BASE.find(x => x.rut === u.rut); if (o && (o.puesto !== u.puesto || o.uen !== u.uen || o.ubicacion !== u.ubicacion || o.empresa !== u.empresa)) ch++; });
+      const chList = [];
+      upd.forEach(u => {
+        const o = BASE.find(x => x.rut === u.rut); if (!o) return;
+        const diffs = [];
+        if (o.puesto !== u.puesto) diffs.push({ campo: "Puesto", antes: o.puesto, despues: u.puesto });
+        if (o.uen !== u.uen) diffs.push({ campo: "UEN", antes: o.uen, despues: u.uen });
+        if (o.empresa !== u.empresa) diffs.push({ campo: "Empresa", antes: o.empresa, despues: u.empresa });
+        if (diffs.length > 0) chList.push({ rut: u.rut, nombre: u.nombre, diffs });
+      });
+      const removed = BASE.filter(r => !new Set(upd.map(u => u.rut)).has(r.rut)).map(r => ({ rut: r.rut, nombre: r.nombre, uen: r.uen, puesto: r.puesto, empresa: r.empresa }));
       setActData(upd);
-      setUpInfo({ fn: file.name, mt: upd.length, rm: BASE.length - upd.length, ch });
+      setChanges(chList);
+      setUpInfo({ fn: file.name, mt: upd.length, rm: removed.length, ch: chList.length, removed });
     } catch (err) { alert("Error: " + err.message); }
     setLoading(false);
   };
 
-  const tabs = [{ id: "resumen", l: "Resumen" }, { id: "cross", l: "Tabla Cruzada" }, { id: "evolution", l: "Evolucion" }, { id: "movimientos", l: "Movimientos" }, { id: "detalle", l: "Detalle" }];
+  const tabs = [{ id: "resumen", l: "Resumen" }, { id: "cross", l: "Tabla Cruzada" }, { id: "evolution", l: "Evolucion" }, { id: "movimientos", l: "Movimientos" }, { id: "detalle", l: "Detalle" }, { id: "cambios", l: changes.length > 0 ? `Cambios (${changes.length})` : "Cambios" }];
 
   if (!auth) return <LoginScreen onAuth={() => setAuth(true)} />;
 
@@ -371,7 +458,7 @@ export default function App() {
           </div>
           <input ref={fRef} type="file" accept=".csv,.xlsx,.xls" onChange={doUpload} style={{ display: "none" }} />
           {!actData ? <button onClick={() => fRef.current.click()} disabled={loading} style={{ padding: "7px 16px", fontSize: 11, fontWeight: 600, borderRadius: 8, border: "none", background: "#205C40", color: "#fff", cursor: "pointer" }}>{loading ? "Procesando..." : "Subir CSV"}</button>
-            : <button onClick={() => { setActData(null); setUpInfo(null); if (fRef.current) fRef.current.value = ""; }} style={{ padding: "7px 16px", fontSize: 11, fontWeight: 600, borderRadius: 8, border: "1px solid #E87722", background: "#fff", color: "#E87722", cursor: "pointer" }}>Quitar filtro</button>}
+            : <button onClick={() => { setActData(null); setUpInfo(null); setChanges([]); if (fRef.current) fRef.current.value = ""; }} style={{ padding: "7px 16px", fontSize: 11, fontWeight: 600, borderRadius: 8, border: "1px solid #E87722", background: "#fff", color: "#E87722", cursor: "pointer" }}>Quitar filtro</button>}
         </div>
 
         <div style={{ display: "flex", gap: 0, borderBottom: "2px solid #eee", marginTop: 14 }}>
@@ -384,6 +471,7 @@ export default function App() {
           {tab === "evolution" && <TabEvo data={data} vig={vig} dateStr={dateStr} sd={sd} actData={actData} />}
           {tab === "movimientos" && <TabMov pS={pS} pI={pI} sd={sd} />}
           {tab === "detalle" && <TabDetalle vig={vig} sd={sd} actData={actData} totH={totH} />}
+          {tab === "cambios" && <TabCambios changes={changes} upInfo={upInfo} />}
         </div>
       </div>
     </div>
