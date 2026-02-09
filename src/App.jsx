@@ -227,7 +227,56 @@ function TabDetalle({ vig, sd, actData, totH }) {
   );
 }
 
+const HASH = "a3c2f8d1e9"; // hashed version of password
+function hashPw(pw) {
+  let h = 0;
+  for (let i = 0; i < pw.length; i++) { h = ((h << 5) - h + pw.charCodeAt(i)) | 0; }
+  return Math.abs(h).toString(16).slice(0, 10);
+}
+// Password: CCU_IS6_2026
+const VALID = hashPw("CCU_IS6_2026");
+
+function LoginScreen({ onAuth }) {
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState(false);
+  const [shake, setShake] = useState(false);
+  const submit = () => {
+    if (hashPw(pw) === VALID) { onAuth(); }
+    else { setErr(true); setShake(true); setTimeout(() => setShake(false), 500); }
+  };
+  return (
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #205C40, #1a4a33 40%, #205C40)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Outfit', -apple-system, sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      <div style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", borderRadius: 16, padding: "40px 36px", width: 360, textAlign: "center", border: "1px solid rgba(255,255,255,0.1)", animation: shake ? "shake 0.4s ease" : "none" }}>
+        <style>{`@keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }`}</style>
+        <div style={{ fontSize: 9, letterSpacing: 2.5, textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>CCU · Atraccion de Talento</div>
+        <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 700, color: "#fff" }}><span style={{ color: "#64A70B" }}>Simulador</span> IS6</h1>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 28px" }}>Ingresa la clave para continuar</p>
+        <input
+          type="password"
+          value={pw}
+          onChange={e => { setPw(e.target.value); setErr(false); }}
+          onKeyDown={e => e.key === "Enter" && submit()}
+          placeholder="Clave de acceso"
+          style={{
+            width: "100%", padding: "12px 16px", fontSize: 14, borderRadius: 8, border: err ? "1.5px solid #A6093D" : "1.5px solid rgba(255,255,255,0.15)",
+            background: "rgba(255,255,255,0.08)", color: "#fff", outline: "none", boxSizing: "border-box", fontFamily: "'Outfit', sans-serif",
+            transition: "border 0.2s",
+          }}
+        />
+        {err && <div style={{ color: "#FB8281", fontSize: 11, marginTop: 8 }}>Clave incorrecta</div>}
+        <button onClick={submit} style={{
+          width: "100%", padding: "12px", fontSize: 13, fontWeight: 600, borderRadius: 8, border: "none",
+          background: "#64A70B", color: "#fff", cursor: "pointer", marginTop: 16, fontFamily: "'Outfit', sans-serif",
+          transition: "background 0.2s",
+        }}>Ingresar</button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const [auth, setAuth] = useState(false);
   const [dateStr, setDateStr] = useState("2026-02-01");
   const [actData, setActData] = useState(null);
   const [upInfo, setUpInfo] = useState(null);
@@ -262,6 +311,8 @@ export default function App() {
   };
 
   const tabs = [{ id: "resumen", l: "Resumen" }, { id: "cross", l: "Tabla Cruzada" }, { id: "evolution", l: "Evolucion" }, { id: "movimientos", l: "Movimientos" }, { id: "detalle", l: "Detalle" }];
+
+  if (!auth) return <LoginScreen onAuth={() => setAuth(true)} />;
 
   return (
     <div style={{ fontFamily: "'Outfit',-apple-system,sans-serif", background: "#FAFAFA", minHeight: "100vh", color: "#212121" }}>
