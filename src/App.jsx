@@ -476,7 +476,7 @@ function LoginScreen({ onAuth }) {
 
 export default function App() {
   const [auth, setAuth] = useState(false);
-  const [dateStr, setDateStr] = useState("2026-02-01");
+  const [dateStr, setDateStr] = useState(new Date().toISOString().slice(0, 10));
   const [actData, setActData] = useState(null);
   const [upInfo, setUpInfo] = useState(null);
   const [tab, setTab] = useState("resumen");
